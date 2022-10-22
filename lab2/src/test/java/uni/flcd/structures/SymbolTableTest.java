@@ -1,4 +1,4 @@
-package structures;
+package uni.flcd.structures;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,5 +42,24 @@ class SymbolTableTest {
 		assertNotNull(victim);
 		assertEquals(1, victim.getSize());
 		assertEquals(Optional.of("b"), victim.getValue(1));
+	}
+
+	@Test
+	@DisplayName("Should hande collision")
+	void shouldHandleCollision() {
+		victim.put(1, "a");
+		victim.put(129, "b");
+		victim.put(257, "c");
+
+		assertNotNull(victim);
+		assertEquals(3, victim.getSize());
+
+		assertTrue(victim.containsKey(1));
+		assertTrue(victim.containsKey(129));
+		assertTrue(victim.containsKey(257));
+
+		assertEquals("a", victim.getValue(1).get());
+		assertEquals("b", victim.getValue(129).get());
+		assertEquals("c", victim.getValue(257).get());
 	}
 }

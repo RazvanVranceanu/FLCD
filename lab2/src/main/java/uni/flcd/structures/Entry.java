@@ -1,4 +1,4 @@
-package structures;
+package uni.flcd.structures;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
