@@ -1,4 +1,4 @@
-package structures;
+package uni.flcd.structures;
 
 import java.util.Optional;
 
@@ -26,21 +26,21 @@ public class SymbolTable<K, V> {
 			return;
 		}
 
+		Entry<K, V> previousNode = null;
 		Entry<K, V> currentNode = table[index];
 		while (null != currentNode) {
 			if (currentNode.getKey().equals(key)) {
-				table[index].setValue(value);
+				currentNode.setValue(value);
 				return;
 			}
+			previousNode = currentNode;
 			currentNode = currentNode.getNext();
 		}
 
-		//TODO: vezi cand ai coliziune ce faci (de aici in jos)
-		if (null != currentNode.getNext()) {
-			currentNode.setNext(entry);
+		if(null != previousNode) {
+			previousNode.setNext(entry);
 			size++;
 		}
-
 	}
 
 	public Optional<V> getValue(K key) {
