@@ -1,0 +1,17 @@
+sum:integer;v:array[100] of integer;i:integer;n:integer
+{
+	read(n);
+	i = 0;
+	while(i < n) {
+		read(v[i]);
+	}
+
+	i = 0;
+	sum = 0;
+
+	while(i < n) {
+		sum = sum + v[i];
+	}
+
+	write(sum);
+}
