@@ -1,0 +1,26 @@
+The words - predefined tokens are specified between " and ":
+Sintactical rules: 
+
+program = decllist ";" cmpdstmt 
+cmpdstmt = "{" stmtlist "}"
+stmtlist = stmt | stmt ";" stmtlist
+stmt = simplstmt | structstmt
+simplstmt = assignstmt | iostmt
+iostmt = "read" | "write" "(" Identifier | "const" ")"
+structstmt = cmpdstmt | ifstmt | whilestmt
+ifstmt = "if" "(" condition ")" cmpdstmt [ "else" cmpdstmt ]
+whilestmt = "while" "(" condition ")" cmpdstmt
+
+assignstmt = Identifier "=" expression
+expression =  ([expresion][operation] term) | term
+term = Identifier | integer 
+
+condition = expression [RELATION]|[logical] expression
+type = "char" | "integer" | "boolean"
+RELATION = "<" | "<=" | "==" | ">" | ">=" | ">"
+operation = “+” | “-” | “*” | “/” | "%"
+logical = "and" | "or"
+
+arraydecl = Identifier ":" "array" "[" nr "]" "of" type
+decllist = declaration | declaration ";" decllist
+declaration = Identifier ":" type | arraydecl

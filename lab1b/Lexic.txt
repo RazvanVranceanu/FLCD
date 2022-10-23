@@ -1,0 +1,35 @@
+1. Alphabet
+	Upper (A-Z) and lowercase letters(a-z) of the english alphabet
+	Decimal digits (0-9)
+2. Lexic
+	a. Special symbols, representing:
+		i. Operators
+			- arithmetic   +   -   *   / %
+			- assignment   =
+			- relational   ==   !=   <   <=   >=   >
+			- logical   and  or
+		ii. Separators   [ ] { }  ;  ,  space
+		iii. Reserved words: char string int boolean const array else if while read print of
+	
+	b. Identifiers
+		Sequence of letters and digits, where the first character must be a letter: 
+		Identifier = letter | letter {(letter|digit)}.
+		letter = a | b | … | z | A |…. | Z
+		digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+		sign = ["+" | "-"]
+	
+	c. Constants
+		i. integer: 
+			integer = zero_digit | [sign]{not_zero_digit}{digit}.
+				where, zero_digit = 0 
+					   not_zero_digit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+			positive_integer = digit | digit {digit}
+		ii. character: 
+			character = [letter]|[digit]
+		iii. string
+			emptyString = ""
+			string = empty_string | char{string}
+		iv. boolean: 0 | 1
+		v. array
+			array = identifier "[" positive_integer "]"
+
