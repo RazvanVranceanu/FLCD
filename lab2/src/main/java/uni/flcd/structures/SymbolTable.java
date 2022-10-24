@@ -1,79 +1,82 @@
 package uni.flcd.structures;
 
+import lombok.Getter;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import uni.flcd.exceptions.ExistentElementException;
+
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class SymbolTable<K, V> {
-	private final Entry<K, V>[] table;
-	private static final int INITIAL_TABLE_CAPACITY = 128;
-	private int size = 0;
+public class SymbolTable {
+    private static final int TABLE_CAPACITY = 256;
+    private final Entry[] table;
+    @Getter
+    private Integer size = 0;
 
-	public SymbolTable() {
-		this.table = new Entry[INITIAL_TABLE_CAPACITY];
-	}
+    public SymbolTable() {
+        this.table = new Entry[TABLE_CAPACITY];
+    }
 
-	public void put(K key, V value) {
-		final Entry<K, V> entry = Entry.<K, V>builder()
-				.key(key)
-				.value(value)
-				.next(null)
-				.build();
+    public void put(String value) {
+        int index = getIndex(value);
+        final AtomicInteger positionInLinkedList = new AtomicInteger(0);
 
-		int index = getIndex(key);
+        Entry newEntry = Entry.builder()
+                .position(new MutablePair<>(index, positionInLinkedList))
+                .token(value)
+                .build();
 
-		if (null == table[index]) {
-			table[index] = entry;
-			size++;
-			return;
-		}
+        if (null == table[index]) {
+            table[index] = newEntry;
+            size++;
+            return;
+        }
 
-		Entry<K, V> previousNode = null;
-		Entry<K, V> currentNode = table[index];
-		while (null != currentNode) {
-			if (currentNode.getKey().equals(key)) {
-				currentNode.setValue(value);
-				return;
-			}
-			previousNode = currentNode;
-			currentNode = currentNode.getNext();
-		}
+        // it means that we have collision
+        Entry previousNode = null;
+        Entry currentNode = table[index];
+        while (null != currentNode) {
+            if (currentNode.getToken().equals(value)) {
+                throw new ExistentElementException("Token with value " + value + " already exists in symbolTable");
+            }
+            previousNode = currentNode;
+            currentNode = currentNode.getNext();
+            positionInLinkedList.incrementAndGet();
+        }
 
-		if(null != previousNode) {
-			previousNode.setNext(entry);
-			size++;
-		}
-	}
+        if (null != previousNode) {
+            previousNode.setNext(newEntry);
+            size++;
+        }
+    }
 
-	public Optional<V> getValue(K key) {
-		Entry<K, V> currentNode = table[getIndex(key)];
-		while(null != currentNode) {
-			if(currentNode.getKey().equals(key)) {
-				return Optional.ofNullable(currentNode.getValue());
-			}
-			currentNode = currentNode.getNext();
-		}
-		return Optional.empty();
-	}
+    public Optional<Pair<Integer, AtomicInteger>> getPositionForValue(String value) {
+        int index = getIndex(value);
+        var currentNode = table[index];
+        while (null != currentNode) {
+            if (currentNode.getToken().equals(value)) {
+                return Optional.ofNullable(currentNode.getPosition());
+            }
+            currentNode = currentNode.getNext();
+        }
+        return Optional.empty();
+    }
 
-	public int getSize() {
-		return this.size;
-	}
+    public Optional<String> getTokenForPosition(Pair<Integer, AtomicInteger> position) {
 
-	public boolean containsKey(K key) {
-		Entry<K, V> currentNode = table[getIndex(key)];
-		while(null != currentNode) {
-			if(currentNode.getKey().equals(key)) {
-				return true;
-			}
-			currentNode = currentNode.getNext();
-		}
-		return false;
-	}
+        var currentNode = table[position.getLeft()];
+        var positionInList = position.getRight().get();
+        while (null != currentNode) {
+            if (currentNode.getPosition().getRight().get() == positionInList) {
+                return Optional.ofNullable(currentNode.getToken());
+            }
+            currentNode = currentNode.getNext();
+        }
+        return Optional.empty();
+    }
 
-	private int getIndex(final K key) {
-		return key.hashCode() % getTableCapacity();
-	}
-
-	private int getTableCapacity() {
-		return table.length;
-	}
+    private int getIndex(final String value) {
+        return value.hashCode() % TABLE_CAPACITY;
+    }
 }
