@@ -1,65 +1,87 @@
 package uni.flcd.structures;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Optional;
-
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uni.flcd.exceptions.ExistentElementException;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SymbolTableTest {
-	private SymbolTable<Integer, String> victim;
+    private SymbolTable victim;
 
-	@BeforeEach
-	void setup() {
+    @BeforeEach
+    void setup() {
+        victim = new SymbolTable();
+    }
 
-		victim = new SymbolTable<>();
-	}
+    @Test
+    @DisplayName("Should Insert Element With No Collision")
+    void shouldInsertElementWithNoCollision() {
+        victim.put("a");
+        victim.put("b");
+        victim.put("c");
 
-	@Test
-	@DisplayName("Should Add Four New Elements")
-	void shouldAddFourNewElements() {
-		victim.put(1, "a");
-		victim.put(2, "b");
-		victim.put(3, "c");
-		victim.put(256, "d");
+        assertNotNull(victim);
+        assertFalse(victim.getPositionForValue("a").isEmpty());
+        assertEquals(97, victim.getPositionForValue("a").get().getKey());
+        assertEquals(0, victim.getPositionForValue("a").get().getValue().get());
 
-		assertNotNull(victim);
-		assertEquals(4, victim.getSize());
-		assertEquals(Optional.of("a"), victim.getValue(1));
-		assertEquals(Optional.of("b"), victim.getValue(2));
-		assertEquals(Optional.of("c"), victim.getValue(3));
-		assertEquals(Optional.of("d"), victim.getValue(256));
-	}
+        assertFalse(victim.getPositionForValue("b").isEmpty());
+        assertEquals(98, victim.getPositionForValue("b").get().getKey());
+        assertEquals(0, victim.getPositionForValue("b").get().getValue().get());
 
-	@Test
-	@DisplayName("Should Update Value For Key")
-	void shouldUpdateValueForKey() {
-		victim.put(1, "a");
-		victim.put(1, "b");
+        assertFalse(victim.getPositionForValue("c").isEmpty());
+        assertEquals(99, victim.getPositionForValue("c").get().getKey());
+        assertEquals(0, victim.getPositionForValue("c").get().getValue().get());
+        assertEquals(3, victim.getSize());
+    }
 
-		assertNotNull(victim);
-		assertEquals(1, victim.getSize());
-		assertEquals(Optional.of("b"), victim.getValue(1));
-	}
+    @Test
+    @DisplayName("Should Insert Element With Collison")
+    void shouldInsertElementWithCollision() {
+        victim.put("Aa");
+        victim.put("BB");
 
-	@Test
-	@DisplayName("Should hande collision")
-	void shouldHandleCollision() {
-		victim.put(1, "a");
-		victim.put(129, "b");
-		victim.put(257, "c");
+        assertNotNull(victim);
 
-		assertNotNull(victim);
-		assertEquals(3, victim.getSize());
+        assertEquals(2, victim.getSize());
 
-		assertTrue(victim.containsKey(1));
-		assertTrue(victim.containsKey(129));
-		assertTrue(victim.containsKey(257));
+        assertFalse(victim.getPositionForValue("Aa").isEmpty());
+        assertEquals(64, victim.getPositionForValue("Aa").get().getKey());
+        assertEquals(0, victim.getPositionForValue("Aa").get().getValue().get());
 
-		assertEquals("a", victim.getValue(1).get());
-		assertEquals("b", victim.getValue(129).get());
-		assertEquals("c", victim.getValue(257).get());
-	}
+        assertFalse(victim.getPositionForValue("BB").isEmpty());
+        assertEquals(64, victim.getPositionForValue("BB").get().getKey());
+        assertEquals(1, victim.getPositionForValue("BB").get().getValue().get());
+    }
+
+    @Test
+    @DisplayName("Should Get Token By Position")
+    void shouldGetTokenByPosition() {
+        victim.put("Aa");
+        victim.put("BB");
+
+        assertFalse(victim.getTokenForPosition(new MutablePair<>(64, new AtomicInteger(0))).isEmpty());
+        assertEquals("Aa", victim.getTokenForPosition(new MutablePair<>(64, new AtomicInteger(0))).get());
+
+        assertFalse(victim.getTokenForPosition(new MutablePair<>(64, new AtomicInteger(1))).isEmpty());
+        assertEquals("BB", victim.getTokenForPosition(new MutablePair<>(64, new AtomicInteger(1))).get());
+
+        assertTrue(victim.getTokenForPosition(new MutablePair<>(64, new AtomicInteger(2))).isEmpty());
+
+    }
+
+    @Test
+    @DisplayName("Should Throw Exception")
+    void shouldThrowException() {
+        victim.put("x");
+
+        assertEquals(1, victim.getSize());
+        assertThrows(ExistentElementException.class, () -> victim.put("x"));
+        assertEquals(1, victim.getSize());
+    }
 }

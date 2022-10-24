@@ -1,18 +1,19 @@
 package uni.flcd.structures;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
 @ToString
-public class Entry<K, V> {
-	private K key;
-	private V value;
-	private Entry<K, V> next;
+public class Entry {
+    // left: position in symbol table
+    // right: position in linked list for collision
+    Pair<Integer, AtomicInteger> position;
+    private String token;
+    private Entry next;
 }
