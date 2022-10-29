@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Builder
 @ToString
 public class Entry {
-    // left: position in symbol table
+    // left: position in array
     // right: position in linked list for collision
     Pair<Integer, AtomicInteger> position;
     private String token;
