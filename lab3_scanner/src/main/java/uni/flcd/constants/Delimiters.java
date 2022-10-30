@@ -5,13 +5,11 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Delimiters {
-    private static final String ARITHMETIC_DELIMITERS = "+-/*<>";
+    private static final String ARITHMETIC_DELIMITERS = "+-/*<>%";
     private static final String PARENTHESES_DELIMITERS = "()[]{}";
     private static final String LOGICAL_DELIMITERS = "!=";
     private static final String BASIC_DELIMITERS = ";,:";
-    private static final String SPACE = " ";
-    private static final String TAB = "";
-
+    public static final String SPACE = " ";
     public static final String DELIMITERS = ARITHMETIC_DELIMITERS +
             PARENTHESES_DELIMITERS +
             LOGICAL_DELIMITERS +
