@@ -14,11 +14,13 @@
 +
 =
 -
-\
+/
 *
+%
 and
 or
 ;
+:
 ,
 if
 else
@@ -28,6 +30,7 @@ char
 boolean
 const
 array
+integer
 read
-print
+write
 of
