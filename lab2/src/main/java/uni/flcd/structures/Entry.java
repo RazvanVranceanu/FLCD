@@ -14,7 +14,7 @@ public class Entry {
     // left: position in array
     // right: position in linked list for collision
     @ToString.Include
-    Pair<Integer, AtomicInteger> position;
+    private Pair<Integer, AtomicInteger> position;
     @ToString.Include
     private String token;
     private Entry next;
