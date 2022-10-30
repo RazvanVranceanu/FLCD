@@ -1,4 +1,4 @@
-package uni.flcd.scannerUtils;
+package uni.flcd.scanner.scannerUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

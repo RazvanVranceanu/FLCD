@@ -1,0 +1,6 @@
+SymbolTable 
+Entry(position=(48,0), token=0)
+Entry(position=(97,0), token=a)
+Entry(position=(98,0), token=b)
+Entry(position=(99,0), token=c)
+Entry(position=(100,0), token=max)
