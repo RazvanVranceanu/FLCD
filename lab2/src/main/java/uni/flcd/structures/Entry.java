@@ -9,11 +9,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @AllArgsConstructor
 @Data
 @Builder
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 public class Entry {
     // left: position in array
     // right: position in linked list for collision
+    @ToString.Include
     Pair<Integer, AtomicInteger> position;
+    @ToString.Include
     private String token;
     private Entry next;
 }

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import uni.flcd.exceptions.ExistentElementException;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -78,5 +79,18 @@ public class SymbolTable {
 
     private int getIndex(final String value) {
         return value.hashCode() % TABLE_CAPACITY;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder("SymbolTable \n");
+        for (int i = 0; i < TABLE_CAPACITY; i ++) {
+            var currentNode = table[i];
+            while(null != currentNode) {
+                stringBuilder.append(currentNode).append("\n");
+                currentNode = currentNode.getNext();
+            }
+        }
+        return stringBuilder.toString();
     }
 }

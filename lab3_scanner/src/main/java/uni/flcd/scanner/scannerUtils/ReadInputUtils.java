@@ -1,7 +1,8 @@
-package uni.flcd.scannerUtils;
+package uni.flcd.scanner.scannerUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReadInputUtils {
     private static final AtomicInteger numberOfLines = new AtomicInteger(0);
@@ -25,7 +27,9 @@ public class ReadInputUtils {
                 line = reader.readLine();
             }
             reader.close();
+            log.info("Successfully read from file {}", pathToFile);
         } catch (IOException e) {
+            log.error("Failed to read from file {}", pathToFile);
             e.printStackTrace();
         }
         return lineMap;
