@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Math.abs;
+
 public class SymbolTable {
     private static final int TABLE_CAPACITY = 256;
     private final Entry[] table;
@@ -78,7 +80,7 @@ public class SymbolTable {
     }
 
     private int getIndex(final String value) {
-        return value.hashCode() % TABLE_CAPACITY;
+        return abs(value.hashCode()) % TABLE_CAPACITY;
     }
 
     @Override

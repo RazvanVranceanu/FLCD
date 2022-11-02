@@ -84,4 +84,11 @@ class SymbolTableTest {
         assertThrows(ExistentElementException.class, () -> victim.put("x"));
         assertEquals(1, victim.getSize());
     }
+
+    @Test
+    void shouldPutConstant() {
+        victim.put("\"hello\"");
+
+        assertEquals(1, victim.getSize());
+    }
 }
