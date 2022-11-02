@@ -28,7 +28,7 @@
 			character = [letter]|[digit]
 		iii. string
 			emptyString = ""
-			string = empty_string | char{string}
+			string = empty_string | "char{string}"
 		iv. boolean: 0 | 1
 		v. array
 			array = identifier "[" positive_integer "]"

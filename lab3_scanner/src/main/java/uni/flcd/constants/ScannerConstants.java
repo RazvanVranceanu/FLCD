@@ -4,7 +4,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Delimiters {
+public class ScannerConstants {
+    public static final String EMPTY_STRING = "";
+
+    public static final String PLUS = "+";
+    public static final String EQUAL = "=";
+    public static final String MINUS = "-";
     private static final String ARITHMETIC_DELIMITERS = "+-/*<>%";
     private static final String PARENTHESES_DELIMITERS = "()[]{}";
     private static final String LOGICAL_DELIMITERS = "!=";

@@ -2,8 +2,9 @@ package uni.flcd.scanner;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import uni.flcd.constants.Delimiters;
+import uni.flcd.constants.ScannerConstants;
 import uni.flcd.exception.LexicalException;
+import uni.flcd.exception.OutOfPlaceOperand;
 import uni.flcd.exceptions.ExistentElementException;
 import uni.flcd.scanner.repository.ProgramInternalForm;
 import uni.flcd.scanner.repository.ReservedWords;
@@ -14,12 +15,12 @@ import uni.flcd.structures.SymbolTable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static uni.flcd.constants.ScannerConstants.*;
 import static uni.flcd.scanner.scannerUtils.ScannerUtils.*;
 
 @Slf4j
 public class Scanner {
 
-    public static final String EMPTY_STRING = "";
     private static final String SYMBOL_TABLE_OUTPUT_FILE = "src/main/resources/ST.out";
     private static final String PIF_OUTPUT_FILE = "src/main/resources/PIF.out";
 
@@ -49,7 +50,7 @@ public class Scanner {
     }
 
     private void scanLine(Integer lineNumber, String line) throws LexicalException {
-        StringTokenizer st = new StringTokenizer(line, Delimiters.DELIMITERS, true);
+        StringTokenizer st = new StringTokenizer(line, ScannerConstants.DELIMITERS, true);
         ArrayList<String> tokens = getAllTokens(st);
 
         for (int i = 0; i < tokens.size(); i++) {
@@ -59,27 +60,43 @@ public class Scanner {
 
     private void analyzeToken(Integer lineNumber, ArrayList<String> tokens, int i) {
         String currentToken = tokens.get(i).strip();
+        Optional<String> oneBeforePrevToken = 0 <= i - 2 ? Optional.ofNullable(tokens.get(i - 2)) : Optional.empty();
+        Optional<String> prevToken = 0 <= i - 1 ? Optional.ofNullable(tokens.get(i - 1)) : Optional.empty();
+        Optional<String> nextToken = i + 1 < tokens.size() ? Optional.ofNullable(tokens.get(i + 1)) : Optional.empty();
 
-        if (isUnifiedToken(tokens, i, currentToken)) {
-            processUnifiedToken(tokens, i, currentToken);
-        } else if (isReservedWord(currentToken)) {
-            processReservedWord(currentToken);
-        } else if (isIdentifier(currentToken)) {
-            processIdentifier(currentToken);
-        } else if (isConstant(currentToken)) {
-            processConstant(currentToken);
-        } else if (!EMPTY_STRING.equals(currentToken)){
-            throw new LexicalException("Illegal token definition \"" + currentToken + "\" at line " + lineNumber);
+        try {
+            if (isUnifiedToken(currentToken, nextToken.orElse(EMPTY_STRING))) {
+                processUnifiedToken(currentToken, nextToken.orElse(EMPTY_STRING));
+            } else if (isReservedWord(prevToken.orElse(EMPTY_STRING), currentToken)) {
+                processReservedWord(prevToken.orElse(EMPTY_STRING), currentToken);
+            } else if (isIdentifier(currentToken)) {
+                processIdentifier(currentToken);
+            } else if (isStringConstant(currentToken)) {
+                processConstant(currentToken);
+            } else if (isNegativeIntegerConstant(oneBeforePrevToken.orElse(EMPTY_STRING), prevToken.orElse(EMPTY_STRING), currentToken)) {
+                processConstant(prevToken.orElse(EMPTY_STRING) + currentToken);
+            } else if (isIntegerConstant(currentToken)) {
+                processConstant(currentToken);
+            } else if (!EMPTY_STRING.equals(currentToken)) {
+                throw new LexicalException("Illegal token definition \"" + currentToken + "\" at line " + lineNumber);
+            }
+        } catch(OutOfPlaceOperand exception) {
+            throw new LexicalException(exception.getMessage() + " at line " + lineNumber);
         }
     }
 
-    private void processReservedWord(String currentToken) {
-        programInternalForm.addReservedWord(currentToken);
-        log.info("Successfully added reserved token {} to PIF", currentToken);
+    private void processReservedWord(String prevToken, String currentToken) {
+        if(isUnifiedToken(prevToken, currentToken) ||
+            MINUS.equals(currentToken) && EQUALS.equals(prevToken)) {
+            log.info("Avoided wrongfully adding reserved word {} to PIF", currentToken);
+        } else {
+            programInternalForm.addReservedWord(currentToken);
+            log.info("Successfully added reserved token {} to PIF", currentToken);
+        }
     }
 
-    private void processUnifiedToken(ArrayList<String> tokens, int i, String currentToken) {
-        String unifiedToken = currentToken + tokens.get(i + 1);
+    private void processUnifiedToken(String currentToken, String nextToken) {
+        String unifiedToken = currentToken + nextToken;
         programInternalForm.addReservedWord(unifiedToken);
         log.info("Successfully added unified token {} to PIF", unifiedToken);
     }
@@ -112,15 +129,21 @@ public class Scanner {
         }
     }
 
-    private boolean isReservedWord(String currentToken) {
-        return reservedWords.contains(currentToken) && !Delimiters.SPACE.equals(currentToken);
+    private boolean isReservedWord(String prevToken, String currentToken) {
+        if(PLUS.equals(currentToken) && EQUALS.equals(prevToken)) {
+            throw new OutOfPlaceOperand("Illegal token definition " + "\"" + currentToken + "\"");
+        }
+        return reservedWords.contains(currentToken) && !SPACE.equals(currentToken);
     }
 
     private ArrayList<String> getAllTokens(StringTokenizer st) {
         ArrayList<String> tokens = new ArrayList<>();
 
         while (st.hasMoreTokens()) {
-            tokens.add(st.nextToken());
+            String token = st.nextToken();
+            if (!SPACE.equals(token)) {
+                tokens.add(token);
+            }
         }
         return tokens;
     }

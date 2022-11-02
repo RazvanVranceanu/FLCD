@@ -4,9 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import uni.flcd.constants.RegexConstants;
 
-import java.util.ArrayList;
-
 import static uni.flcd.constants.RegexConstants.*;
+import static uni.flcd.constants.ScannerConstants.MINUS;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,10 +19,18 @@ public class ScannerUtils {
         return token.matches(INT_REGEX) || token.matches(STRING_REGEX);
     }
 
-    public static boolean isUnifiedToken(ArrayList<String> tokens, int i, String currentToken) {
-        return currentToken.matches(RegexConstants.SPLIT_REGEX) &&
-                null != tokens.get(i + 1) &&
-                EQUALS.equals(tokens.get(i + 1));
+    public static boolean isNegativeIntegerConstant(String oneBeforePrevToken, String prevToken, String token) {
+        return !oneBeforePrevToken.matches(IDENTIFIER_REGEX) && prevToken.equals(MINUS) && token.matches(INT_REGEX);
+    }
+    public static boolean isIntegerConstant(String token) {
+        return token.matches(INT_REGEX);
+    }
+    public static boolean isStringConstant(String token) {
+        return token.matches(STRING_REGEX);
     }
 
+    public static boolean isUnifiedToken(String currentToken, String nextToken) {
+        return currentToken.matches(RegexConstants.SPLIT_REGEX) &&
+                EQUALS.equals(nextToken);
+    }
 }

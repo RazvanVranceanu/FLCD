@@ -11,7 +11,7 @@ public class ProgramInternalForm {
     private static final String CONST = "const";
     private static final String ID = "id";
     @Getter
-    private final List<Pair<String, Pair<Integer, AtomicInteger>>> programInternalForm;
+    private final List<Pair<String, Pair<Integer, AtomicInteger>>> programInternalForm; //todo: should make new class for the first Pair
 
     public ProgramInternalForm() {
         this.programInternalForm = new ArrayList<>();
@@ -33,10 +33,7 @@ public class ProgramInternalForm {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("ProgramInternalForm \n");
         programInternalForm
-                .forEach(element -> {
-                    stringBuilder.append(element.getLeft()).append(" ").append(element.getRight()).append("\n");
-                });
-
+                .forEach(element -> stringBuilder.append(element.getLeft()).append(" ").append(element.getRight()).append("\n"));
         return stringBuilder.toString();
     }
 }
