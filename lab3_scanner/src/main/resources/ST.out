@@ -1,6 +1,9 @@
 SymbolTable 
 Entry(position=(48,0), token=0)
-Entry(position=(97,0), token=a)
-Entry(position=(98,0), token=b)
-Entry(position=(99,0), token=c)
-Entry(position=(100,0), token=max)
+Entry(position=(75,0), token=sum)
+Entry(position=(105,0), token=i)
+Entry(position=(110,0), token=n)
+Entry(position=(118,0), token=v)
+Entry(position=(120,0), token=x)
+Entry(position=(206,0), token="hello")
+Entry(position=(241,0), token=100)

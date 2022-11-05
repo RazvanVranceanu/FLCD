@@ -1,13 +1,13 @@
 2a:integer;b:integer;
 {
-	do {
-		write(b);
-	} while (2a > 0) {
+	b = +12	
+
+	while (2a > 0) {
 		2a = 2a - 1;
 	}
 }
 
 
 in the example above there are 2 lexical errors;
-1. 2a:integer -> illegal token "2a"
-2. do -> unknown token "do"
+1. +12 -> out of place operand
+2. 2a:integer -> illegal token "2a"
