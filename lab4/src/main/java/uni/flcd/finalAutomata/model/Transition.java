@@ -1,14 +1,20 @@
 package uni.flcd.finalAutomata.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(cacheStrategy = EqualsAndHashCode.CacheStrategy.LAZY)
 public class Transition {
-    @EqualsAndHashCode.Exclude
     private State destState;
     private String value;
+
+    @Override
+    public String toString() {
+        return " -- " + value + " --> " + destState.getLabel();
+    }
 }

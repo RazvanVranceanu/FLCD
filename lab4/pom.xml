@@ -17,6 +17,7 @@
 
         <slf4j.version>2.0.3</slf4j.version>
         <logback-classic.version>1.4.4</logback-classic.version>
+        <junit-jupiter-engine.version>5.8.1</junit-jupiter-engine.version>
     </properties>
 
     <dependencies>
@@ -46,6 +47,13 @@
             <version>${logback-classic.version}</version>
         </dependency>
 
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter-engine.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

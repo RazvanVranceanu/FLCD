@@ -78,7 +78,7 @@ public class FinalAutomataProcessor {
         finalAutomata.addTransition(srcState, destState, value);
     }
 
-    public boolean acceptWord(String word) {
-        return finalAutomata.acceptWord(word);
+    public boolean validateWord(String word) {
+        return finalAutomata.validateWord(word);
     }
 }

@@ -12,30 +12,16 @@ import java.util.*;
 import static uni.flcd.finalAutomata.model.StateType.FINAL;
 import static uni.flcd.finalAutomata.model.StateType.INITIAL;
 
-/**
- * The type Final automata.
- */
 @NoArgsConstructor
 @Data
 public class FinalAutomata {
     private final Set<String> alphabet = new HashSet<>();
     private final Map<State, List<Transition>> states = new HashMap<>();
 
-    /**
-     * Add state.
-     *
-     * @param state the state
-     */
     public void addState(State state) {
         states.putIfAbsent(state, new ArrayList<>());
     }
 
-    /**
-     * Gets state for label.
-     *
-     * @param label the label
-     * @return the state for label
-     */
     public State getStateForLabel(String label) {
         return states.keySet().stream()
                 .filter(state -> state.getLabel().equals(label))
@@ -43,13 +29,6 @@ public class FinalAutomata {
                 .orElseThrow(() -> new IllegalState("Illegal label for a state: " + label));
     }
 
-    /**
-     * Add transition.
-     *
-     * @param srcState  the src state
-     * @param destState the dest state
-     * @param value     the value
-     */
     public void addTransition(final State srcState, final State destState, final String value) {
         if (!alphabet.contains(value)) {
             throw new IllegalAlphabet("Illegal alphabet value: " + value);
@@ -69,24 +48,8 @@ public class FinalAutomata {
                 .build());
     }
 
-    /**
-     * Add to alphabet.
-     *
-     * @param token the token
-     */
     public void addToAlphabet(String token) {
         alphabet.add(token);
-    }
-
-
-    /**
-     * Is dfa boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isDFA() {
-        // TODO: 12.11.2022
-        return true;
     }
 
     private State getStartingState() {
@@ -97,13 +60,7 @@ public class FinalAutomata {
                 .orElseThrow(() -> new IllegalState("No starting state"));
     }
 
-    /**
-     * Accept word boolean.
-     *
-     * @param word the word
-     * @return the boolean
-     */
-    private boolean acceptWord(String word) {
+    public boolean validateWord(String word) {
         State currentState = getStartingState();
 
         var index = 0;
