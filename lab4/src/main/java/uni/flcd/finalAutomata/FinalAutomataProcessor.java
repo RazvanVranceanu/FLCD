@@ -33,7 +33,6 @@ public class FinalAutomataProcessor {
                 default -> processTransition(line);
             }
         });
-        System.out.println(finalAutomata);
     }
 
     private void processAlphabet(String line) {
