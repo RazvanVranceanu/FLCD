@@ -1,0 +1,14 @@
+a:integer;b:integer;c:integer;max:integer;
+{
+	max = 0;
+	if(a > max) {
+		max = a;
+	}
+	if(b > max) {
+		max = b;
+	}
+	if(c > max) {
+		max = c;
+	}
+	write(max);
+}
