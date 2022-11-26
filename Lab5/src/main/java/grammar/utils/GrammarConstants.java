@@ -8,4 +8,6 @@ public class GrammarConstants {
     public static final String NON_TERMINAL = "N=";
     public static final String TERMINAL = "E=";
     public static final String START_SYMBOL = "S=";
+
+    public static final String COLUMN = ",";
 }

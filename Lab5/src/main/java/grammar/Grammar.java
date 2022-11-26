@@ -1,6 +1,7 @@
 package grammar;
 
-import ch.qos.logback.core.joran.sanity.Pair;
+import ch.qos.logback.core.util.StringCollectionUtil;
+import grammar.exceptions.InvalidCfg;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static grammar.utils.GrammarConstants.*;
+import static grammar.utils.GrammarUtils.getElementsFromLine;
 
 @AllArgsConstructor
 @Builder
@@ -24,7 +26,6 @@ import static grammar.utils.GrammarConstants.*;
 @Slf4j
 public class Grammar {
 
-    private static final String COLUMN = ",";
     @Default
     private Set<String> nonTerminals = new HashSet<>();
     @Default
@@ -32,10 +33,8 @@ public class Grammar {
     @Default
     private String startingSymbol = "";
     @Default
-    private Set<Pair<String, String>> productions = new HashSet<>();
-    @Default
-    private Map<String, String> nonTerminalToProduction = new HashMap<>();
-
+    private Map<String, List<Production>> productions = new HashMap<>();
+    @ToString.Exclude
     private String fileName;
 
     private Stream<String> readFromInputStream() {
@@ -49,22 +48,47 @@ public class Grammar {
 
     public void aggregateData() {
         log.info("Trying to aggregate grammar from file");
+        productions.put("epsilon", List.of(Production.builder().productionNodes(List.of("")).build()));
         readFromInputStream().forEach(line -> {
             if (line.startsWith(NON_TERMINAL)) {
-                Arrays.stream(line.substring(2)
-                                .split(COLUMN))
+                getElementsFromLine(line.substring(2), COLUMN)
                         .collect(Collectors.toCollection(() -> nonTerminals));
+                log.info("Successfully aggregated non terminals = {}", nonTerminals);
             } else if (line.startsWith(TERMINAL)) {
-                Arrays.stream(line.substring(2)
-                                .split(COLUMN))
+                getElementsFromLine(line.substring(2), COLUMN)
                         .collect(Collectors.toCollection(() -> terminals));
+                log.info("Successfully aggregated terminals = {}", terminals);
             } else if (line.startsWith(START_SYMBOL)) {
+                if (!startingSymbol.isEmpty()) {
+                    throw new InvalidCfg("Invalid CFG: Can't have more than one starting point.");
+                }
                 startingSymbol = line;
-            } else{
-                String key = line.split("-")[0];
-                String[] productions = line.split("-")[1]
-                        .split("\\|");
+                log.info("Successfully aggregated starting symbol = {}", startingSymbol);
+            } else {
+                String leftHandSide = line.split("#")[0];
+                String rightHandSide = line.split("#")[1];
+                List<Production> productionsForKey = getProductionsForKey(rightHandSide);
+                productions.put(leftHandSide, productionsForKey);
+                log.info("Successfully aggregated productions {} for key={}", productionsForKey, leftHandSide);
             }
         });
+        if(!isCFG()) {
+            throw new InvalidCfg("Grammar is not context free.");
+        }
+        log.info("Successfully aggregated grammar from file");
+    }
+
+    private List<Production> getProductionsForKey(String rightHandSide) {
+        return getElementsFromLine(rightHandSide, "\\|")
+                .map(production -> Production.builder()
+                        .productionNodes(getElementsFromLine(production, ",").toList())
+                        .build())
+                .toList();
+    }
+
+    private boolean isCFG() {
+        return productions.keySet()
+                .stream()
+                .noneMatch(key -> key.split(",").length > 1 || terminals.contains(key));
     }
 }

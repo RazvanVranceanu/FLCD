@@ -1,4 +1,4 @@
 N=S
-E=a,b
+E=a,b,c
 S=S
-S-ab|aS
+S#a,S,b,S|a,S|c
