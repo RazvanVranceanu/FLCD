@@ -1,6 +1,5 @@
 package grammar;
 
-import ch.qos.logback.core.util.StringCollectionUtil;
 import grammar.exceptions.InvalidCfg;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +35,7 @@ public class Grammar {
     private Map<String, List<Production>> productions = new HashMap<>();
     @ToString.Exclude
     private String fileName;
+
 
     private Stream<String> readFromInputStream() {
         try {

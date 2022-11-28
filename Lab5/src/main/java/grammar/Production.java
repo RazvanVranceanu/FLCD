@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @Data
 public class Production {
+
     private List<String> productionNodes;
 
     @Override
