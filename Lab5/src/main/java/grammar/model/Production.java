@@ -1,4 +1,4 @@
-package grammar;
+package grammar.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +18,7 @@ public class Production {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        productionNodes.forEach(stringBuilder::append);
+        productionNodes.forEach(s -> stringBuilder.append(s).append(" "));
         return stringBuilder.toString();
     }
 }

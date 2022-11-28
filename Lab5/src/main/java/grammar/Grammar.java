@@ -1,6 +1,7 @@
 package grammar;
 
 import grammar.exceptions.InvalidCfg;
+import grammar.model.Production;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
