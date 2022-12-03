@@ -1,4 +1,4 @@
-package parser.model;
+package parser.model.enums;
 
 public enum State {
     NORMAL,

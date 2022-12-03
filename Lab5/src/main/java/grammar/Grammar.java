@@ -68,18 +68,18 @@ public class Grammar {
             } else {
                 String leftHandSide = line.split("#")[0];
                 String rightHandSide = line.split("#")[1];
-                List<Production> productionsForKey = getProductionsForKey(rightHandSide);
+                List<Production> productionsForKey = parseProductionsForKey(rightHandSide);
                 productions.put(leftHandSide, productionsForKey);
                 log.info("Successfully aggregated productions {} for key={}", productionsForKey, leftHandSide);
             }
         });
-        if(!isCFG()) {
+        if (!isCFG()) {
             throw new InvalidCfg("Grammar is not context free.");
         }
         log.info("Successfully aggregated grammar from file");
     }
 
-    private List<Production> getProductionsForKey(String rightHandSide) {
+    private List<Production> parseProductionsForKey(String rightHandSide) {
         return getElementsFromLine(rightHandSide, "\\|")
                 .map(production -> Production.builder()
                         .productionNodes(getElementsFromLine(production, ",").toList())
@@ -87,9 +87,35 @@ public class Grammar {
                 .toList();
     }
 
+    public Optional<List<Production>> getProductionForKey(String key) {
+        return Optional.ofNullable(productions.get(key));
+    }
+
+
+    public Optional<Production> getProductionForKeyAndIndex(String key, int index) {
+        try {
+            return Optional.ofNullable(productions.get(key)
+                    .get(index));
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            return Optional.empty();
+        }
+    }
+
     private boolean isCFG() {
         return productions.keySet()
                 .stream()
                 .noneMatch(key -> key.split(",").length > 1 || terminals.contains(key));
+    }
+
+    public boolean hasMoreProductions(String key, int index) {
+        return index < productions.get(key).size();
+    }
+
+    public boolean isNonTerminal(String element) {
+        return nonTerminals.contains(element);
+    }
+
+    public boolean isTerminal(String element) {
+        return terminals.contains(element);
     }
 }

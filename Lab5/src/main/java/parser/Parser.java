@@ -1,30 +1,128 @@
 package parser;
 
-import lombok.NoArgsConstructor;
+import com.google.common.collect.Lists;
+import grammar.Grammar;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import parser.model.Configuration;
+import parser.model.TransitionElement;
+import parser.model.enums.State;
+import parser.model.enums.Type;
 
 import java.util.Stack;
 
-@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Slf4j
 public class Parser {
 
-    public void expand(Configuration configuration) {
+    Grammar grammar;
 
+    public void expand(Configuration configuration) {
+        log.info("Trying to apply expand function on configuration {}", configuration);
+        Stack<TransitionElement> workingStack = configuration.getWorkingStack();
+        Stack<String> inputStack = configuration.getInputStack();
+
+        if (grammar.isNonTerminal(inputStack.peek())) {
+            var nonTerminalHead = inputStack.pop();
+
+            grammar.getProductionForKeyAndIndex(nonTerminalHead, 0)
+                    .ifPresent(production -> Lists.reverse(production.getProductionNodes())
+                            .forEach(inputStack::push));
+
+            workingStack.push(TransitionElement.builder()
+                    .value(nonTerminalHead)
+                    .index(0)
+                    .type(Type.NONTERMINAL)
+                    .build());
+
+            log.info("Successfully applied expand function with new configuration {}", configuration);
+        }
+
+        log.error("Failed to apply expand function on configuration {}", configuration);
     }
 
     public void advance(Configuration configuration) {
-        Stack<String> workingStack = configuration.getWorkingStack();
+        log.info("Trying to apply advance function on configuration {}", configuration);
+        Stack<TransitionElement> workingStack = configuration.getWorkingStack();
         Stack<String> inputStack = configuration.getInputStack();
-        workingStack.push(inputStack.pop());
+
+        if(grammar.isTerminal(inputStack.peek())) {
+            configuration.getIndex().getAndIncrement();
+
+            workingStack.push(TransitionElement.builder()
+                    .value(inputStack.pop())
+                    .type(Type.TERMINAL)
+                    .build());
+
+            log.info("Successfully applied advance function with new configuration {}", configuration);
+        }
+
+        log.error("Failed to apply advance function on configuration {}", configuration);
     }
 
-    public void momentaryInsuccess(Stack<String> workingStack, Stack<String> inputStack) {
+    public void momentaryInsuccess(Configuration configuration) {
+        log.info("Trying to apply momentary insuccess function to configuration {}", configuration);
+        Stack<String> inputStack = configuration.getInputStack();
 
+        //todo: should I check here if the current symbol from input matches?
+        if(grammar.isTerminal(inputStack.peek())) {
+            configuration.setState(State.BACK);
+            log.info("Successfully applied momentary insuccess function with new configuration {}", configuration);
+        }
+        log.error("Failed to apply momentary insuccess function to configuration {}", configuration);
     }
 
-    public void back(Stack<String> workingStack, Stack<String> inputStack) {
+    public void back(Configuration configuration) {
+        log.info("Trying to apply back function to configuration {}", configuration);
 
+        String headWorkingStack = configuration.getWorkingStack().pop().getValue();
+
+        if(grammar.isTerminal(headWorkingStack)) {
+            configuration.getIndex().getAndDecrement();
+            configuration.getInputStack().push(headWorkingStack);
+            log.info("Successfully applied back function with new configuration {}", configuration);
+        }
+        log.error("Failed to apply back function to configuration {}", configuration);
+    }
+
+    public void anotherTry(Configuration configuration) {
+        log.info("Trying to apply another try function for configuration {}", configuration);
+        Stack<TransitionElement> workingStack = configuration.getWorkingStack();
+        Stack<String> inputStack = configuration.getInputStack();
+
+        TransitionElement headWorkingStack = workingStack.pop();
+        inputStack.pop();
+
+        if(grammar.hasMoreProductions(headWorkingStack.getValue(), headWorkingStack.getIndex())) {
+            workingStack.push(TransitionElement.builder()
+                            .value(headWorkingStack.getValue())
+                            .index(headWorkingStack.getIndex() + 1)
+                            .type(Type.NONTERMINAL)
+                    .build());
+
+            grammar.getProductionForKeyAndIndex(headWorkingStack.getValue(), headWorkingStack.getIndex() + 1)
+                    .ifPresent(production -> Lists.reverse(production.getProductionNodes())
+                            .forEach(inputStack::push));
+            configuration.setState(State.NORMAL);
+            log.info("Successfully applied another try case 1 with new configuration {}", configuration);
+        } else if(!grammar.hasMoreProductions(headWorkingStack.getValue(), headWorkingStack.getIndex())) {
+            inputStack.push(headWorkingStack.getValue());
+            configuration.setState(State.BACK);
+            log.info("Successfully applied another try case 2 with new configuration {}", configuration);
+        } else if(configuration.getIndex().get() == 1) {
+            configuration.setState(State.ERROR);
+            log.info("Successfully applied another try case 3 with new configuration {}", configuration);
+        }
+
+        log.error("Failed to apply another try function for configuration {}", configuration);
+    }
+
+    public void success(Configuration configuration) {
+        //todo: checks?
+        log.info("Trying to apply success function for configuration {}", configuration);
+        configuration.setState(State.FINAL);
+        log.info("Successfully applied success function for configuration {}", configuration);
     }
 }
