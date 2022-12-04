@@ -2,6 +2,7 @@ package parser;
 
 import com.google.common.collect.Lists;
 import grammar.Grammar;
+import grammar.model.Production;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -24,23 +25,20 @@ public class Parser {
         Stack<TransitionElement> workingStack = configuration.getWorkingStack();
         Stack<String> inputStack = configuration.getInputStack();
 
-        if (grammar.isNonTerminal(inputStack.peek())) {
-            var nonTerminalHead = inputStack.pop();
+        var nonTerminalHead = inputStack.pop();
 
-            grammar.getProductionForKeyAndIndex(nonTerminalHead, 0)
-                    .ifPresent(production -> Lists.reverse(production.getProductionNodes())
-                            .forEach(inputStack::push));
+        grammar.getProductionForKeyAndIndex(nonTerminalHead, 0)
+                .ifPresent(production -> Lists.reverse(production.getProductionNodes())
+                        .forEach(inputStack::push));
 
-            workingStack.push(TransitionElement.builder()
-                    .value(nonTerminalHead)
-                    .index(0)
-                    .type(Type.NONTERMINAL)
-                    .build());
+        workingStack.push(TransitionElement.builder()
+                .value(nonTerminalHead)
+                .index(0)
+                .type(Type.NONTERMINAL)
+                .build());
 
-            log.info("Successfully applied expand function with new configuration {}", configuration);
-        }
+        log.info("Successfully applied expand function with new configuration {}", configuration);
 
-        log.error("Failed to apply expand function on configuration {}", configuration);
     }
 
     public void advance(Configuration configuration) {
@@ -48,30 +46,22 @@ public class Parser {
         Stack<TransitionElement> workingStack = configuration.getWorkingStack();
         Stack<String> inputStack = configuration.getInputStack();
 
-        if(grammar.isTerminal(inputStack.peek())) {
-            configuration.getIndex().getAndIncrement();
+        configuration.getIndex().getAndIncrement();
 
-            workingStack.push(TransitionElement.builder()
-                    .value(inputStack.pop())
-                    .type(Type.TERMINAL)
-                    .build());
+        workingStack.push(TransitionElement.builder()
+                .value(inputStack.pop())
+                .type(Type.TERMINAL)
+                .build());
 
-            log.info("Successfully applied advance function with new configuration {}", configuration);
-        }
+        log.info("Successfully applied advance function with new configuration {}", configuration);
 
-        log.error("Failed to apply advance function on configuration {}", configuration);
     }
 
     public void momentaryInsuccess(Configuration configuration) {
         log.info("Trying to apply momentary insuccess function to configuration {}", configuration);
-        Stack<String> inputStack = configuration.getInputStack();
+        configuration.setState(State.BACK);
+        log.info("Successfully applied momentary insuccess function with new configuration {}", configuration);
 
-        //todo: should I check here if the current symbol from input matches?
-        if(grammar.isTerminal(inputStack.peek())) {
-            configuration.setState(State.BACK);
-            log.info("Successfully applied momentary insuccess function with new configuration {}", configuration);
-        }
-        log.error("Failed to apply momentary insuccess function to configuration {}", configuration);
     }
 
     public void back(Configuration configuration) {
@@ -79,12 +69,9 @@ public class Parser {
 
         String headWorkingStack = configuration.getWorkingStack().pop().getValue();
 
-        if(grammar.isTerminal(headWorkingStack)) {
-            configuration.getIndex().getAndDecrement();
-            configuration.getInputStack().push(headWorkingStack);
-            log.info("Successfully applied back function with new configuration {}", configuration);
-        }
-        log.error("Failed to apply back function to configuration {}", configuration);
+        configuration.getIndex().getAndDecrement();
+        configuration.getInputStack().push(headWorkingStack);
+        log.info("Successfully applied back function with new configuration {}", configuration);
     }
 
     public void anotherTry(Configuration configuration) {
@@ -93,13 +80,19 @@ public class Parser {
         Stack<String> inputStack = configuration.getInputStack();
 
         TransitionElement headWorkingStack = workingStack.pop();
-        inputStack.pop();
+        var productionSize = grammar.getProductionForKeyAndIndex(headWorkingStack.getValue(), headWorkingStack.getIndex())
+                .orElse(Production.builder().build())
+                .getProductionNodes()
+                .size();
+        for (int i = 0; i < productionSize; i++) {
+            inputStack.pop();
+        }
 
-        if(grammar.hasMoreProductions(headWorkingStack.getValue(), headWorkingStack.getIndex())) {
+        if (grammar.hasMoreProductions(headWorkingStack.getValue(), headWorkingStack.getIndex())) {
             workingStack.push(TransitionElement.builder()
-                            .value(headWorkingStack.getValue())
-                            .index(headWorkingStack.getIndex() + 1)
-                            .type(Type.NONTERMINAL)
+                    .value(headWorkingStack.getValue())
+                    .index(headWorkingStack.getIndex() + 1)
+                    .type(Type.NONTERMINAL)
                     .build());
 
             grammar.getProductionForKeyAndIndex(headWorkingStack.getValue(), headWorkingStack.getIndex() + 1)
@@ -107,20 +100,22 @@ public class Parser {
                             .forEach(inputStack::push));
             configuration.setState(State.NORMAL);
             log.info("Successfully applied another try case 1 with new configuration {}", configuration);
-        } else if(!grammar.hasMoreProductions(headWorkingStack.getValue(), headWorkingStack.getIndex())) {
+        } else if (!grammar.hasMoreProductions(headWorkingStack.getValue(), headWorkingStack.getIndex())) {
+            if (configuration.getIndex().get() == 0 &&
+                    grammar.isStartingSymbol(headWorkingStack.getValue())) {
+                configuration.setState(State.ERROR);
+                log.info("Successfully applied another try case 3 with new configuration {}", configuration);
+                return;
+            }
             inputStack.push(headWorkingStack.getValue());
             configuration.setState(State.BACK);
             log.info("Successfully applied another try case 2 with new configuration {}", configuration);
-        } else if(configuration.getIndex().get() == 1) {
-            configuration.setState(State.ERROR);
-            log.info("Successfully applied another try case 3 with new configuration {}", configuration);
+        } else {
+            log.error("Failed to apply another try function for configuration {}", configuration);
         }
-
-        log.error("Failed to apply another try function for configuration {}", configuration);
     }
 
     public void success(Configuration configuration) {
-        //todo: checks?
         log.info("Trying to apply success function for configuration {}", configuration);
         configuration.setState(State.FINAL);
         log.info("Successfully applied success function for configuration {}", configuration);

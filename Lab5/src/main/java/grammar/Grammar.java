@@ -63,7 +63,7 @@ public class Grammar {
                 if (!startingSymbol.isEmpty()) {
                     throw new InvalidCfg("Invalid CFG: Can't have more than one starting point.");
                 }
-                startingSymbol = line;
+                startingSymbol = line.substring(2);
                 log.info("Successfully aggregated starting symbol = {}", startingSymbol);
             } else {
                 String leftHandSide = line.split("#")[0];
@@ -108,7 +108,7 @@ public class Grammar {
     }
 
     public boolean hasMoreProductions(String key, int index) {
-        return index < productions.get(key).size();
+        return index < productions.get(key).size() - 1;
     }
 
     public boolean isNonTerminal(String element) {
@@ -117,5 +117,9 @@ public class Grammar {
 
     public boolean isTerminal(String element) {
         return terminals.contains(element);
+    }
+
+    public boolean isStartingSymbol(String element) {
+        return startingSymbol.equals(element);
     }
 }

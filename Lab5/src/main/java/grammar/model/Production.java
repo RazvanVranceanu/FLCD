@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -13,7 +14,8 @@ import java.util.List;
 @Data
 public class Production {
 
-    private List<String> productionNodes;
+    @Builder.Default
+    private List<String> productionNodes = new ArrayList<>();
 
     @Override
     public String toString() {
