@@ -120,4 +120,50 @@ public class Parser {
         configuration.setState(State.FINAL);
         log.info("Successfully applied success function for configuration {}", configuration);
     }
+
+    public void parse(String word) {
+        Configuration configuration = Configuration.builder().build();
+        configuration.getInputStack().push(grammar.getStartingSymbol());
+
+        while (!State.FINAL.equals(configuration.getState()) && !State.ERROR.equals(configuration.getState())) {
+            if (State.NORMAL.equals(configuration.getState())) {
+                if (word.length() == configuration.getIndex().get() && configuration.getInputStack().isEmpty()) {
+                    success(configuration);
+                } else {
+                    if (grammar.isNonTerminal(configuration.getInputStack().peek())) {
+                        expand(configuration);
+                    } else if (grammar.isTerminal(configuration.getInputStack().peek())) {
+                        advance(configuration);
+                    } else {
+                        momentaryInsuccess(configuration);
+                    }
+                }
+            } else if (State.BACK.equals(configuration.getState())) {
+                if (Type.TERMINAL.equals(configuration.getWorkingStack().peek().getType())) {
+                    back(configuration);
+                } else {
+                    anotherTry(configuration);
+                }
+            }
+        }
+
+        if (State.ERROR.equals(configuration.getState())) {
+            log.error("Word {} is not accepted", word);
+        } else {
+            log.info("Word {} is accepted", word);
+            buildStringOfProd(configuration.getWorkingStack());
+        }
+    }
+
+    private void buildStringOfProd(Stack<TransitionElement> workingStack) {
+        StringBuilder stringOfProductions = new StringBuilder();
+        while(!workingStack.empty()) {
+            TransitionElement headOfStack = workingStack.pop();
+            if(Type.NONTERMINAL.equals(headOfStack.getType())) {
+                stringOfProductions.append(headOfStack.getValue()).append(headOfStack.getIndex());
+            }
+        }
+
+        log.info("This is the string of productions {}", stringOfProductions);
+    }
 }

@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import parser.model.enums.Type;
 
-import java.util.Optional;
-
 
 @AllArgsConstructor
 @NoArgsConstructor
