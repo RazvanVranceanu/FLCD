@@ -14,6 +14,7 @@ import parser.model.enums.Type;
 import java.util.List;
 import java.util.Stack;
 
+import static parser.ParserOutput.buildStringOfProd;
 import static parser.ParserUtils.*;
 
 @AllArgsConstructor
@@ -167,17 +168,6 @@ public class Parser {
         } else {
             anotherTry(configuration);
         }
-    }
-
-    private void buildStringOfProd(Stack<TransitionElement> workingStack) {
-        StringBuilder stringOfProductions = new StringBuilder();
-        workingStack.forEach(element -> {
-            if (Type.NONTERMINAL.equals(element.getType())) {
-                stringOfProductions.append(element.getValue()).append(element.getIndex());
-            }
-        });
-
-        log.info("This is the string of productions {}", stringOfProductions);
     }
 
     private boolean isHeadTerminal(Configuration configuration) {
