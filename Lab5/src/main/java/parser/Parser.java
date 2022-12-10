@@ -14,6 +14,8 @@ import parser.model.enums.Type;
 import java.util.List;
 import java.util.Stack;
 
+import static parser.ParserUtils.*;
+
 @AllArgsConstructor
 @Builder
 @Slf4j
@@ -55,7 +57,6 @@ public class Parser {
                 .build());
 
         log.info("Successfully applied advance function with new configuration {}", configuration);
-
     }
 
     public void momentaryInsuccess(Configuration configuration) {
@@ -116,7 +117,7 @@ public class Parser {
         }
     }
 
-    public void success(Configuration configuration) {
+    public static void success(Configuration configuration) {
         log.info("Trying to apply success function for configuration {}", configuration);
         configuration.setState(State.FINAL);
         log.info("Successfully applied success function for configuration {}", configuration);
@@ -126,49 +127,64 @@ public class Parser {
         Configuration configuration = Configuration.builder().build();
         configuration.getInputStack().push(grammar.getStartingSymbol());
 
-        while (!State.FINAL.equals(configuration.getState()) && !State.ERROR.equals(configuration.getState())) {
-            if (State.NORMAL.equals(configuration.getState())) {
-                if (word.size() == configuration.getIndex().get() && configuration.getInputStack().isEmpty()) {
+        while (!configuration.isErrorState()) {
+            if (configuration.isNormalState()) {
+
+                if (isWordParsed(word, configuration) && configuration.isInputStackEmpty()) {
                     success(configuration);
-                } else {
-                    if (grammar.isNonTerminal(configuration.getInputStack().peek())) {
-                        expand(configuration);
-                    } else if (grammar.isTerminal(configuration.getInputStack().peek()) &&
-                            configuration.getIndex().get() < word.size() &&
-                            configuration.getInputStack().peek().equals(word.get(configuration.getIndex().get()))) {
-                        advance(configuration);
-                    } else {
-                        momentaryInsuccess(configuration);
-                    }
+                    log.info("Word {} is accepted", word);
+                    buildStringOfProd(configuration.getWorkingStack());
+                    return true;
                 }
-            } else if (State.BACK.equals(configuration.getState())) {
-                if (Type.TERMINAL.equals(configuration.getWorkingStack().peek().getType())) {
-                    back(configuration);
-                } else {
-                    anotherTry(configuration);
-                }
+
+                analyzeNormalState(word, configuration);
+
+            } else if (configuration.isBackState()) {
+                analyzeBackState(configuration);
             }
         }
 
-        if (State.ERROR.equals(configuration.getState())) {
-            log.error("Word {} is not accepted", word);
-            return false;
+        log.error("Word {} is not accepted", word);
+        return false;
+    }
+
+    private void analyzeNormalState(List<String> word, Configuration configuration) {
+        if (isHeadNonTerminal(configuration)) {
+            expand(configuration);
+        } else if (isHeadTerminal(configuration) && isIndexInbounds(word, configuration) &&
+                headEqualsCurrentSymbol(word, configuration)) {
+            advance(configuration);
         } else {
-            log.info("Word {} is accepted", word);
-            buildStringOfProd(configuration.getWorkingStack());
-            return true;
+            momentaryInsuccess(configuration);
+        }
+    }
+
+    private void analyzeBackState(Configuration configuration) {
+        TransitionElement head = configuration.getWorkingStack().peek();
+
+        if (Type.TERMINAL.equals(head.getType())) {
+            back(configuration);
+        } else {
+            anotherTry(configuration);
         }
     }
 
     private void buildStringOfProd(Stack<TransitionElement> workingStack) {
         StringBuilder stringOfProductions = new StringBuilder();
-        while(!workingStack.empty()) {
-            TransitionElement headOfStack = workingStack.pop();
-            if(Type.NONTERMINAL.equals(headOfStack.getType())) {
-                stringOfProductions.append(headOfStack.getValue()).append(headOfStack.getIndex());
+        workingStack.forEach(element -> {
+            if (Type.NONTERMINAL.equals(element.getType())) {
+                stringOfProductions.append(element.getValue()).append(element.getIndex());
             }
-        }
+        });
 
         log.info("This is the string of productions {}", stringOfProductions);
+    }
+
+    private boolean isHeadTerminal(Configuration configuration) {
+        return grammar.isTerminal(configuration.getInputStack().peek());
+    }
+
+    private boolean isHeadNonTerminal(Configuration configuration) {
+        return grammar.isNonTerminal(configuration.getInputStack().peek());
     }
 }

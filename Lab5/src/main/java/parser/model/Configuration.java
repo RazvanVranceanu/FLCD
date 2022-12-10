@@ -25,4 +25,25 @@ public class Configuration {
     private Stack<TransitionElement> workingStack = new Stack<>();
     @Builder.Default
     private Stack<String> inputStack = new Stack<>();
+
+
+    public boolean isErrorState() {
+        return State.ERROR.equals(state);
+    }
+
+    public boolean isFinalState() {
+        return State.FINAL.equals(state);
+    }
+
+    public boolean isNormalState() {
+        return State.NORMAL.equals(state);
+    }
+
+    public boolean isBackState() {
+        return State.BACK.equals(state);
+    }
+
+    public boolean isInputStackEmpty() {
+        return inputStack.empty();
+    }
 }
