@@ -11,6 +11,7 @@ import parser.model.TransitionElement;
 import parser.model.enums.State;
 import parser.model.enums.Type;
 
+import java.util.List;
 import java.util.Stack;
 
 @AllArgsConstructor
@@ -121,18 +122,20 @@ public class Parser {
         log.info("Successfully applied success function for configuration {}", configuration);
     }
 
-    public void parse(String word) {
+    public boolean parse(List<String> word) {
         Configuration configuration = Configuration.builder().build();
         configuration.getInputStack().push(grammar.getStartingSymbol());
 
         while (!State.FINAL.equals(configuration.getState()) && !State.ERROR.equals(configuration.getState())) {
             if (State.NORMAL.equals(configuration.getState())) {
-                if (word.length() == configuration.getIndex().get() && configuration.getInputStack().isEmpty()) {
+                if (word.size() == configuration.getIndex().get() && configuration.getInputStack().isEmpty()) {
                     success(configuration);
                 } else {
                     if (grammar.isNonTerminal(configuration.getInputStack().peek())) {
                         expand(configuration);
-                    } else if (grammar.isTerminal(configuration.getInputStack().peek())) {
+                    } else if (grammar.isTerminal(configuration.getInputStack().peek()) &&
+                            configuration.getIndex().get() < word.size() &&
+                            configuration.getInputStack().peek().equals(word.get(configuration.getIndex().get()))) {
                         advance(configuration);
                     } else {
                         momentaryInsuccess(configuration);
@@ -149,9 +152,11 @@ public class Parser {
 
         if (State.ERROR.equals(configuration.getState())) {
             log.error("Word {} is not accepted", word);
+            return false;
         } else {
             log.info("Word {} is accepted", word);
             buildStringOfProd(configuration.getWorkingStack());
+            return true;
         }
     }
 

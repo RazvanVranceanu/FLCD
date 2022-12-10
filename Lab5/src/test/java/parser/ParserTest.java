@@ -18,8 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ParserTest {
 
-    private static final String VALID_WORD_1 = "aac";
-    private static final String INVALID_WORD_1 = "adf";
+    private static final List<String> VALID_WORD_1 = List.of("a", "a", "c");
+    private static final List<String> VALID_WORD_2 = List.of("a", "a", "c", "b", "c");
+    private static final List<String> INVALID_WORD_1 = List.of("a", "d", "f");
 
     Grammar grammar;
     Parser victim;
@@ -213,11 +214,22 @@ class ParserTest {
 
     @Test
     void shouldAcceptWord() {
-        victim.parse(VALID_WORD_1);
+        boolean result = victim.parse(VALID_WORD_1);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldAcceptWord2() {
+        boolean result = victim.parse(VALID_WORD_2);
+
+        assertTrue(result);
     }
 
     @Test
     void shouldNotAcceptWord() {
-        victim.parse(INVALID_WORD_1);
+        boolean result = victim.parse(INVALID_WORD_1);
+
+        assertFalse(result);
     }
 }
