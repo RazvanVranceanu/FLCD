@@ -36,4 +36,6 @@ public class ProgramInternalForm {
                 .forEach(element -> stringBuilder.append(element.getLeft()).append(" ").append(element.getRight()).append("\n"));
         return stringBuilder.toString();
     }
+
+
 }

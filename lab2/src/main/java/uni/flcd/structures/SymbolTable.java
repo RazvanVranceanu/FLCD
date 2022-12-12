@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import uni.flcd.exceptions.ExistentElementException;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,6 +14,7 @@ import static java.lang.Math.abs;
 
 public class SymbolTable {
     private static final int TABLE_CAPACITY = 256;
+    @Getter
     private final Entry[] table;
     @Getter
     private Integer size = 0;
