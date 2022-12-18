@@ -11,6 +11,6 @@ public class Main {
         ProgramInternalForm programInternalForm = new ProgramInternalForm();
         ReservedWords reservedWords = new ReservedWords("src/main/resources/token.in");
         Scanner scanner = new Scanner(symbolTable, programInternalForm, reservedWords);
-        scanner.scan("src/main/resources/p3.txt");
+        scanner.scan("src/main/resources/p2.txt");
     }
 }

@@ -1,23 +1,24 @@
-N=program,decllist,cmpdstmt,stmtlist,stmt,simplstmt,structstmt,assignstmt,iostmt,ifstmt,whilestmt,expression,operation,term,condition,relation,logical,arraydecl,declaration,type,epsilon
-E=read,write,and,or,const,char,integer,boolean,array,of,if,else,string,and,or,+,-,*,/,%,<,<=,==,>,>=,>,!=,[,],{,},(,), ,;,id
+N=program,decllist,cmpdstmt,stmtlist,stmt,simplstmt,structstmt,assignstmt,iostmt,ifstmt,whilestmt,expression,operation,term,condition,relation,logical,arraydecl,declaration,type,arrayelem,epsilon
+E=read,write,and,or,const,char,integer,boolean,array,of,if,while,else,string,and,or,+,-,*,/,%,=,<,<=,==,>,>=,>,!=,[,],{,},(,), ,;,id,:
 S=program
 program#decllist,;,cmpdstmt
 cmpdstmt#{,stmtlist,}
-stmtlist#stmt|stmt,;,stmtlist
+stmtlist#stmt,;|stmt,;,stmtlist
 stmt#simplstmt|structstmt
 simplstmt#assignstmt|iostmt
-iostmt#read,(,id,)|read,(,const,)|write,(,id,)|write,(,const,)
-structstmt#cmpdstmt|ifstmt|whilestmt
+iostmt#read,(,term,)|write,(,term,)
+structstmt#ifstmt|whilestmt|cmpdstmt
 ifstmt#if,(,condition,),cmpdstmt|if,(,condition,),cmpdstmt,else,cmpdstmt
 whilestmt#while,(,condition,),cmpdstmt
 assignstmt#id,=,expression
-expression#expression,operation,term|term
-term#id|integer
+expression#term,operation,term|term
+term#id|const|arrayelem
+arrayelem#id,[,id,]|id,[,const,]
 condition#expression,relation,expression|expression,logical,expression
 type#char|integer|boolean
-relation#<|<=|==|>|>=|>
+relation#<|<=|==|>|>=|>|!=
 operation#+|-|*|/|%
 logical#and|or
-arraydecl#id,:,array,[,NR,],of,type
+arraydecl#id,:,array,[,const,],of,type
 decllist#declaration|declaration,;,decllist
 declaration#id,:,type|arraydecl

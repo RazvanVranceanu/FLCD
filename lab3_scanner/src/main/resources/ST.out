@@ -1,7 +1,7 @@
 SymbolTable 
 Entry(position=(48,0), token=0)
-Entry(position=(75,0), token=sum)
-Entry(position=(105,0), token=i)
-Entry(position=(110,0), token=n)
-Entry(position=(118,0), token=v)
-Entry(position=(241,0), token=100)
+Entry(position=(49,0), token=1)
+Entry(position=(50,0), token=2)
+Entry(position=(100,0), token=d)
+Entry(position=(127,0), token=prime)
+Entry(position=(196,0), token=nr)

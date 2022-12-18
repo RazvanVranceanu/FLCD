@@ -32,8 +32,6 @@ public class Main {
 
         List<String> word = new ArrayList<>();
 
-        word.add("program");
-
         programInternalForm.getProgramInternalForm()
                 .stream()
                 .map(Pair::getLeft)
