@@ -21,6 +21,7 @@ class ParserTest {
     private static final List<String> VALID_WORD_1 = List.of("a", "a", "c");
     private static final List<String> VALID_WORD_2 = List.of("a", "a", "c", "b", "c");
     private static final List<String> INVALID_WORD_1 = List.of("a", "d", "f");
+    private static final List<String> INVALID_WORD_2 = List.of("c", "c");
 
     Grammar grammar;
     Parser victim;
@@ -229,6 +230,13 @@ class ParserTest {
     @Test
     void shouldNotAcceptWord() {
         boolean result = victim.parse(INVALID_WORD_1);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldNotAcceptWord2() {
+        boolean result = victim.parse(INVALID_WORD_2);
 
         assertFalse(result);
     }

@@ -171,10 +171,16 @@ public class Parser {
     }
 
     private boolean isHeadTerminal(Configuration configuration) {
+        if (configuration.getInputStack().isEmpty()) {
+            return false;
+        }
         return grammar.isTerminal(configuration.getInputStack().peek());
     }
 
     private boolean isHeadNonTerminal(Configuration configuration) {
+        if(configuration.getInputStack().isEmpty()) {
+            return false;
+        }
         return grammar.isNonTerminal(configuration.getInputStack().peek());
     }
 }

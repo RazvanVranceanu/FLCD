@@ -31,7 +31,7 @@ public class ParserOutput {
         StringBuilder stringOfProductions = new StringBuilder();
         workingStack.forEach(element -> {
             if (Type.NONTERMINAL.equals(element.getType())) {
-                stringOfProductions.append(element.getValue()).append(element.getIndex());
+                stringOfProductions.append(element.getValue()).append(element.getIndex()).append("\n");
             }
         });
         writeParserOutput(String.valueOf(stringOfProductions));
