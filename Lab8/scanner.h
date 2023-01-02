@@ -32,3 +32,4 @@
 #define SMALLER_OR_EQUAL 32
 #define SMALLER_THAN 33
 #define WHILE 34
+#define COLON 35

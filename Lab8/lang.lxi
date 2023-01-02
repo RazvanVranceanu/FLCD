@@ -7,7 +7,7 @@ int lines = 0;
 
 %option noyywrap
 
-ID ^([a-zA-z]+)([0-9]*)([a-zA-z]*)
+ID [a-zA-Z][a-zA-Z0-9]*
 NBR (^([-]?[1-9][0-9]*)|(0)$)
 STRG (^(\"[a-zA-Z0-9]*\")$)
 CST {NBR}|{STRG}
@@ -37,8 +37,9 @@ of	{printf( "Reserved word: %s\n", yytext); return OF;}
 "/"	{printf( "Operator: %s\n", yytext ); return DIV;}
 "="	{printf( "Separator: %s\n", yytext ); return ATRIB;}
 "%"	{printf( "Operator: %s\n", yytext ); return MOD;}
-";"	{printf( "Operator: %s\n", yytext ); return SEMI_COLON;}
-","	{printf( "Operator: %s\n", yytext ); return COMMA;}
+";"	{printf( "Separator: %s\n", yytext ); return SEMI_COLON;}
+":" {printf( "Separator: %s\n", yytext ); return COLON;}
+","	{printf( "Separator: %s\n", yytext ); return COMMA;}
 "=="	{printf( "Separator: %s\n", yytext); return EQUALS;}
 ">="	{printf( "Separator: %s\n", yytext); return GREATER_OR_EQUAL;}
 ">"	{printf( "Separator: %s\n", yytext); return BIGGER_THAN;}
