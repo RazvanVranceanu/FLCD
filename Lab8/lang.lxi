@@ -1,0 +1,53 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include "scanner.h"
+int lines = 0;
+%}
+
+%option noyywrap
+
+ID ^([a-zA-z]+)([0-9]*)([a-zA-z]*)
+NBR (^([-]?[1-9][0-9]*)|(0)$)
+STRG (^(\"[a-zA-Z0-9]*\")$)
+CST {NBR}|{STRG}
+%%
+or	{printf( "Reserved word: %s\n", yytext); return OR;}
+and	{printf( "Reserved word: %s\n", yytext); return AND;}
+if	{printf( "Reserved word: %s\n", yytext); return IF;}
+else	{printf( "Reserved word: %s\n", yytext); return ELSE;}
+while	{printf( "Reserved word: %s\n", yytext); return WHILE;}
+for	{printf( "Reserved word: %s\n", yytext); return FOR;}
+integer {printf( "Reserved word: %s\n", yytext); return INTEGER;}
+boolean	{printf( "Reserved word: %s\n", yytext); return BOOLEAN;}
+char {printf( "Reserved word: %s\n", yytext); return CHAR;}
+write	{printf( "Reserved word: %s\n", yytext); return PRINT;}
+read	{printf( "Reserved word: %s\n", yytext); return READ;}
+array	{printf( "Reserved word: %s\n", yytext); return ARRAY;}
+of	{printf( "Reserved word: %s\n", yytext); return OF;}
+"{"	{printf( "Separator: %s\n", yytext ); return OPEN_CURLY_BRACKET;}
+"}"	{printf( "Separator: %s\n", yytext ); return CLOSED_CURLY_BRACKET;}
+"("	{printf( "Separator: %s\n", yytext ); return OPEN_ROUND_BRACKET;}
+")"	{printf( "Separator: %s\n", yytext ); return CLOSED_ROUND_BRACKET;}
+"["	{printf( "Separator: %s\n", yytext ); return OPEN_RIGHT_BRACKET;}
+"]"	{printf( "Separator: %s\n", yytext ); return CLOSED_RIGHT_BRACKET;}
+"+"	{printf( "Operator: %s\n", yytext ); return PLUS;}
+"-"	{printf( "Operator: %s\n", yytext ); return MINUS;}
+"*"	{printf( "Operator: %s\n", yytext ); return MUL;}
+"/"	{printf( "Operator: %s\n", yytext ); return DIV;}
+"="	{printf( "Separator: %s\n", yytext ); return ATRIB;}
+"%"	{printf( "Operator: %s\n", yytext ); return MOD;}
+";"	{printf( "Operator: %s\n", yytext ); return SEMI_COLON;}
+","	{printf( "Operator: %s\n", yytext ); return COMMA;}
+"=="	{printf( "Separator: %s\n", yytext); return EQUALS;}
+">="	{printf( "Separator: %s\n", yytext); return GREATER_OR_EQUAL;}
+">"	{printf( "Separator: %s\n", yytext); return BIGGER_THAN;}
+"<="	{printf( "Separator: %s\n", yytext); return SMALLER_OR_EQUAL;}
+"<"	{printf( "Separator: %s\n", yytext); return SMALLER_THAN;}
+
+{ID} {printf( "Identifier: %s\n", yytext); return IDENTIFIER;}
+{CST} {printf("Constant: %s\n", yytext); return CONSTANT;}
+
+[ \t]+ {}
+[\n]+ {++lines;}
+%%
