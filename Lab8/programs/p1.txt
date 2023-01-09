@@ -1,6 +1,8 @@
 a:integer;b:integer;c:integer;max:integer;
 {
-	max = 0;
+	0b;
+	max = -20;
+	max = +20;
 	if(a > max) {
 		max = a;
 	};

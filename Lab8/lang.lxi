@@ -2,16 +2,26 @@
 #include <stdio.h>
 #include <string.h>
 #include "scanner.h"
-int lines = 0;
+int lines = 1;
 %}
 
 %option noyywrap
 
 ID [a-zA-Z][a-zA-Z0-9]*
-NBR (^([-]?[1-9][0-9]*)|(0)$)
-STRG (^(\"[a-zA-Z0-9]*\")$)
-CST {NBR}|{STRG}
+NBR (([-]?[1-9][0-9]*)|(0))
+STRG (\"[a-zA-Z0-9]*\")
+CST {NBR}|(^[a-zA-Z0-9]*$)
+
+ERRORNRCONST =.*\+.*{NBR}
+ERRORCST [0-9]+[a-zA-Z][a-zA-Z0-9]*
+ERRORSTRG (\"[^a-zA-Z0-9]*\")
+
 %%
+{ERRORNRCONST} {printf("Illegal constant at line %d\n", lines); return -420;}
+{ERRORCST} {printf("Illegal constant at line %d\n", lines); return -420;}
+{ERRORSTRG} {printf("Illegal string at line %d\n", lines); return -420;}
+[ ]+ {}
+
 or	{printf( "Reserved word: %s\n", yytext); return OR;}
 and	{printf( "Reserved word: %s\n", yytext); return AND;}
 if	{printf( "Reserved word: %s\n", yytext); return IF;}
@@ -48,7 +58,10 @@ of	{printf( "Reserved word: %s\n", yytext); return OF;}
 
 {ID} {printf( "Identifier: %s\n", yytext); return IDENTIFIER;}
 {CST} {printf("Constant: %s\n", yytext); return CONSTANT;}
+{STRG} {printf("Constant: %s\n", yytext); return CONSTANT;}
 
-[ \t]+ {}
+[\t]+ {}
 [\n]+ {++lines;}
+. {}
+
 %%

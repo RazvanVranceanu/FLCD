@@ -1,4 +1,4 @@
-comenzi pt Mac Apple Silicon:
+comenzi pt rulat tema:
 
 lex nume1.lxi
 cc -o nume2 lex.yy.c -lc -ll
